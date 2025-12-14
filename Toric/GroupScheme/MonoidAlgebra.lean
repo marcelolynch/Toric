@@ -73,7 +73,6 @@ lemma specCommMonAlgPullbackObjIso_mul_aux :
   dsimp
   ext <;> simp [h₂, h₃, RingHom.algebraMap_toAlgebra]
 
-set_option maxHeartbeats 0 in
 private
 lemma specCommMonAlgPullbackObjXIso_mul :
     μ ≫ (specCommMonAlgPullbackObjXIso M f Sf H).hom =

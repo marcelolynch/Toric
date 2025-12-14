@@ -99,7 +99,7 @@ lemma charDiag_symm_apply (g : G) :
 
 lemma charDiag_diagHomGrp (f : _ →+ G) : charDiag R G (diagHomGrp _ f) = f (.of 0) := by
   apply (charDiag R G).symm.injective
-  simp [charDiag_symm_apply]
+  simp only [AddEquiv.symm_apply_apply, PUnit.zero_eq, charDiag_symm_apply]
   congr 1
   ext
   simp only [FreeAbelianGroup.lift_apply_of]
@@ -145,7 +145,7 @@ attribute [-simp] charPairingAux_apply_apply in
 /-- The `ℤ`-valued perfect pairing between characters and cocharacters of group schemes over a
 domain.
 
-Note: This exists over a general base using Cartier duality, but we do not prove that.  -/
+Note: This exists over a general base using Cartier duality, but we do not prove that. -/
 noncomputable def charPairing : X*(Spec R, G) →ₗ[ℤ] X(Spec R, G) →ₗ[ℤ] ℤ where
   toFun x :=
   { toFun y := charTorusUnit (R := R) (charPairingAux (S := Spec R) (G := G) x y)
@@ -157,6 +157,7 @@ noncomputable def charPairing : X*(Spec R, G) →ₗ[ℤ] X(Spec R, G) →ₗ[�
     LinearMap.coe_mk, AddHom.coe_mk, eq_intCast, Int.cast_eq, LinearMap.smul_apply]
 
 set_option maxHeartbeats 0 in
+-- FIXME: Get rid of raised heartbeats
 instance isPerfPair_charPairing [T.IsSplitTorusOver Spec(R)] [LocallyOfFiniteType (T ↘ Spec(R))] :
     (charPairing R T).IsPerfPair := by
   obtain ⟨σ, _, e, _, _⟩ := exists_iso_diag_finite_of_isSplitTorusOver_locallyOfFiniteType T Spec(R)

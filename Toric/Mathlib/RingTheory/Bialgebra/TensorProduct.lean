@@ -37,9 +37,8 @@ def mulCoalgHom : A ⊗[R] A →ₗc[R] A where
   counit_comp := by ext; simp [mul_comm]
   map_comp_comul := by
     ext a b
-    simp [← (ℛ R a).eq, ← (ℛ R b).eq]
-    simp_rw [sum_tmul, tmul_sum]
-    simp [Finset.sum_mul_sum]
+    simp [← (ℛ R a).eq, ← (ℛ R b).eq, sum_tmul]
+    simp [tmul_sum, Finset.sum_mul_sum]
 
 @[simp] lemma mulCoalgHom_apply (a b : A) : mulCoalgHom R A (a ⊗ₜ b) = a * b := rfl
 

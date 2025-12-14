@@ -344,6 +344,7 @@ instance [Algebra R T] : (pullbackSymmetry .. ≪≫ pullbackSpecIso' R S T).hom
       Scheme.canonicallyOverPullback_over]
     simp [specOverSpec_over, pullbackSpecIso']
 
+set_option linter.flexible false in
 variable (R S T) in
 lemma μ_pullback_left_fst [Algebra R T] :
     (LaxMonoidal.μ (Over.pullback (Spec.map (CommRingCat.ofHom (algebraMap R S))))
@@ -416,6 +417,7 @@ affine group schemes over `Spec R`.
 
 section rightEdge
 
+set_option linter.flexible false in
 /-- The essential image of `R`-algebras under `Spec` is precisely affine schemes over `Spec R`. -/
 @[simp]
 lemma essImage_algSpec {G : Over <| Spec R} : (algSpec R).essImage G ↔ IsAffine G.left := by
