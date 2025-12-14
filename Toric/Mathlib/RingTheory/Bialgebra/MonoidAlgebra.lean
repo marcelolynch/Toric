@@ -4,7 +4,7 @@ import Toric.Mathlib.RingTheory.Bialgebra.Convolution
 
 noncomputable section
 
-open TensorProduct MonoidAlgebra Bialgebra Coalgebra Function
+open TensorProduct Bialgebra Coalgebra Function
 
 variable {R S A G H I M N : Type*}
 
@@ -18,17 +18,16 @@ variable [Semiring A] [Bialgebra R A]
 section Monoid
 variable [Monoid M] [Monoid N]
 
-/-- A `R`-algebra homomorphism from `MonoidAlgebra R M` is uniquely defined by its
+/-- A `R`-algebra homomorphism from `R[M]` is uniquely defined by its
 values on the functions `single a 1`. -/
-lemma bialgHom_ext ⦃φ₁ φ₂ : MonoidAlgebra R M →ₐc[R] A⦄
-    (h : ∀ x, φ₁ (single x 1) = φ₂ (single x 1)) : φ₁ = φ₂ :=
+lemma bialgHom_ext ⦃φ₁ φ₂ : R[M] →ₐc[R] A⦄ (h : ∀ x, φ₁ (single x 1) = φ₂ (single x 1)) : φ₁ = φ₂ :=
   BialgHom.coe_algHom_injective <| algHom_ext h
 
 -- The priority must be `high`.
 /-- See note [partially-applied ext lemmas]. -/
 @[ext high]
-lemma bialgHom_ext' ⦃φ₁ φ₂ : MonoidAlgebra R M →ₐc[R] A⦄
-    (h : (φ₁ : MonoidAlgebra R M →* A).comp (of R M) = .comp φ₂ (of R M)) : φ₁ = φ₂ :=
+lemma bialgHom_ext' ⦃φ₁ φ₂ : R[M] →ₐc[R] A⦄
+    (h : (φ₁ : R[M] →* A).comp (of R M) = .comp φ₂ (of R M)) : φ₁ = φ₂ :=
   bialgHom_ext fun x ↦ congr($h x)
 
 @[simp] lemma counit_domCongr (e : M ≃* N) (x : MonoidAlgebra A M) :
@@ -46,7 +45,7 @@ def domCongrBialgHom (e : M ≃* N) : MonoidAlgebra A M ≃ₐc[R] MonoidAlgebra
 
 variable (M) in
 /-- The trivial monoid algebra is isomorphic to the base ring. -/
-noncomputable def bialgEquivOfSubsingleton [Subsingleton M] : MonoidAlgebra R M ≃ₐc[R] R where
+noncomputable def bialgEquivOfSubsingleton [Subsingleton M] : R[M] ≃ₐc[R] R where
   __ := Bialgebra.counitBialgHom ..
   invFun := algebraMap _ _
   left_inv r := by
@@ -54,7 +53,7 @@ noncomputable def bialgEquivOfSubsingleton [Subsingleton M] : MonoidAlgebra R M 
     congr 1
     ext g : 2
     simp [Subsingleton.elim g 1]
-  right_inv := (Bialgebra.counitAlgHom R (MonoidAlgebra R M)).commutes
+  right_inv := (Bialgebra.counitAlgHom R (R[M])).commutes
 
 end Monoid
 
@@ -90,12 +89,12 @@ variable [Algebra R A] [Monoid M]
 
 variable (R M A) in
 /-- `MonoidAlgebra.lift` as a `MulEquiv`. -/
-def liftMulEquiv : (M →* A) ≃* (MonoidAlgebra R M →ₐ[R] A) where
+def liftMulEquiv : (M →* A) ≃* (R[M] →ₐ[R] A) where
   __ := lift R M A
   map_mul' f g := by ext; simp [AlgHom.convMul_apply]
 
 @[simp]
-lemma convMul_algHom_single (f g : MonoidAlgebra R M →ₐ[R] A) (x : M) :
+lemma convMul_algHom_single (f g : R[M] →ₐ[R] A) (x : M) :
     (f * g) (single x 1) = f (single x 1) * g (single x 1) := by simp [AlgHom.convMul_apply]
 
 end Algebra
@@ -103,7 +102,7 @@ end Algebra
 variable [Bialgebra R A]
 
 @[simp]
-lemma convMul_bialgHom_single [CommMonoid M] (f g : MonoidAlgebra R M →ₐc[R] A) (x : M) :
+lemma convMul_bialgHom_single [CommMonoid M] (f g : R[M] →ₐc[R] A) (x : M) :
     (f * g) (single x 1) = f (single x 1) * g (single x 1) := by
   simp [← BialgHom.toCoalgHom_apply, ← CoalgHom.coe_toLinearMap, ← CoalgHom.toLinearMap_eq_coe,
     -LinearMap.coe_coe, BialgHom.toLinearMap_convMul]
@@ -122,11 +121,11 @@ lemma comulAlgHom_comp_mapRangeRingHom :
     (comulAlgHom S (MonoidAlgebra S M)).toRingHom.comp (mapRangeRingHom M f) =
       .comp (Algebra.TensorProduct.mapRingHom f (mapRangeRingHom M f) (mapRangeRingHom M f)
         (by ext; simp) (by ext; simp))
-        (comulAlgHom R (MonoidAlgebra R M)).toRingHom := by ext <;> simp
+        (comulAlgHom R (R[M])).toRingHom := by ext <;> simp
 
 lemma counitAlgHom_comp_mapRangeRingHom :
     (counitAlgHom S (MonoidAlgebra S M)).toRingHom.comp (mapRangeRingHom M f) =
-      f.comp (counitAlgHom R (MonoidAlgebra R M)).toRingHom := by ext <;> simp
+      f.comp (counitAlgHom R (R[M])).toRingHom := by ext <;> simp
 
 end CommMonoid
 end CommSemiring
