@@ -11,12 +11,72 @@ import subprocess
 import json
 import pathlib
 
+LEGACY_URL = (
+    "https://raw.githubusercontent.com/"
+    "leanprover-community/queueboard/refs/heads/master/"
+    "processed_data/open_pr_data.json"
+)
+
+NEW_URL = (
+    "https://queueboard-backend-7f9cf5a8499a.herokuapp.com/"
+    "api/v1/queueboard/snapshot"
+    "?repo=leanprover-community/mathlib4&rule_set_id=1"
+)
+
+def fetch_prs(*, legacy: bool) -> dict[int, dict]:
+    """
+    Fetch PR data from queueboard and normalize it to the internal format.
+
+    Returns:
+        dict[int, dict] mapping PR number to:
+            {
+              "number": int,
+              "title": str,
+              "is_draft": bool,
+              "files": list[str],
+            }
+    """
+    url = LEGACY_URL if legacy else NEW_URL
+
+    result = subprocess.run(
+        ["curl", url],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    payload = json.loads(result.stdout)
+
+    pr_dict: dict[int, dict] = {}
+
+    if legacy:
+        # Old format: payload["pr_statusses"] : list
+        for pr in payload["pr_statusses"]:
+            number = pr["number"]
+            pr_dict[number] = {
+                "number": number,
+                "title": pr["title"],
+                "is_draft": pr["is_draft"],
+                "files": pr["files"],
+            }
+    else:
+        # New format: payload["prs"] : dict keyed by PR number (string)
+        for number_str, pr in payload["prs"].items():
+            if pr.get("state") != "open":
+                continue
+
+            number = int(number_str)
+            pr_dict[number] = {
+                "number": number,
+                "title": pr["title"],
+                "is_draft": pr["is_draft"],
+                "files": pr.get("modified_files", []),
+            }
+
+    return pr_dict
+
 def main():
-    pr_file = subprocess.run(["curl", "https://raw.githubusercontent.com/leanprover-community/queueboard/refs/heads/master/processed_data/open_pr_data.json"],
-        capture_output = True,
-        text = True)
-    pr_json = json.loads(pr_file.stdout)["pr_statusses"]
-    pr_dict = {pr["number"] : pr for pr in pr_json}
+    pr_dict = fetch_prs(legacy=False)
 
     file_touched_pr = {}
     for pr in pr_dict:
